@@ -1,0 +1,50 @@
+=encoding utf8
+
+=head1 NAME
+
+xuserrun - Run a command as the currently-active X.org server user
+
+=head1 SYNOPSIS
+
+Usage: I<xuserrun> [program] [--options*] [...*]
+
+=head1 DESCRIPTION
+
+xuserrun allows a command to be run on the X.org user's display.  It determines the DISPLAY and USER environmental variables of the logged-in user necessary to run a program through the X.org server display.  Its primary use is to be able to run a X.org program from within another environment (different user, console, cron, boot script...).
+
+=head1 EXAMPLES
+
+=over 4
+
+=item B<xuserrun xclock -digital>
+
+To run xclock in digital form.
+
+=item B<xuserrun notify-send "Hello, Dave.">
+
+To send a notification to the desktop.
+
+=item B<xuserrun bash -c "xterm & xclock">
+
+A shell will need to be invoked to run more than one program at a time.
+
+=back
+
+=head1 BUGS
+
+xuserrun is designed for use on a single X.org server display (one X.org user desktop running at a time).  xuserrun cycles through systemd's recorded active login sessions starting from the first login until it discovers a valid DISPLAY variable and then defines the USER and DISPLAY variables.  If other displays are being used, xuserrun will be unable to determine them.
+
+xuserrun assumes that the user is on the default loginctl 'seat', and
+will need to be modified if you require multi-seat support (see <http://www.freedesktop.org/wiki/Software/systemd/multiseat> for more information).
+
+=head1 SEE ALSO
+
+B<loginctl>(1)
+
+=head1 AUTHOR
+
+Todd Partridge E<lt>toddrpartridge@gmail.comE<gt>, <https://github.com/rephormE>
+
+=head1 COPYRIGHT
+
+Copyright  ©  2013  Free Software Foundation, Inc.  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.  This is free software: you are free  to  change  and  redistribute  it.  There is NO WARRANTY, to the extent permitted by law.

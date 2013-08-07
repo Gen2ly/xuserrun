@@ -1,56 +1,38 @@
 #!/bin/bash
+# Run a command as the currently active X.org server user
 
-#
-# Run a command as the currently active X11 user 
-#
+# Display usage if no parameters given
+if [[ -z "$@" ]]; then
+  echo "${0##*/} [program] [--options*] [...*] - run a program as the X.org server user"
+  exit 1; fi
 
-seat="seat0"
+# Programs existence check
+for prog in loginctl "$1"; do
+  if ! hash $prog 2>&- /dev/null; then
+    echo "${0##*/}: non-existent program or not installed: "$prog"" && \
+    non_prog=yes; fi; done
+    [[ $non_prog = yes ]] && exit 1
 
-# determine location of loginctl
-LOGINCTL=$(command -v loginctl || command -v systemd-loginctl)
-if [[ -e LOGINCTL ]]; then
-  echo "Error: Unable to find loginctl executable"
-  exit 1
-fi
+# Discover DISPLAY and USER values (from first)
+seat="seat0" # only single-seated (single-server) use detectable
+actv_sesss=$(loginctl show-seat $seat -p Sessions | cut -d= -f2 | rev)
+for session in ${actv_sesss[@]}; do
+  sess_disp=$(loginctl show-session $session -p Display | cut -d= -f2)
+  sess_user=$(loginctl show-session $session -p Name    | cut -d= -f2)
+  [[ $sess_disp = :[[0-9] ]] && break; done
 
-get_session_info() {
-  local session="$1"
-  local varname="$2"
-  local IFS=$'\n'
-  eval declare -Ag $varname 
-  for row in $(loginctl show-session "$session"); do
-    key="$(echo "${row}"|cut -d= -f1)"
-    val="$(echo "${row}"|cut -d= -f2-)"
-    eval ${varname}[\"${key}\"]=\"${val}\"
-  done
-}
+# Exit if no X.org server is running
+[[ $sess_disp != :[0-9] ]] && \
+{ echo "${0##*/}: no X.org server detected running"; exit 1; }
 
-escape() {
-  for arg in "$@" ; do
-    printf "%q " "$arg";
-  done;
-}
-
-active_session="$(loginctl show-seat ${seat}|grep ActiveSession|cut -d= -f2)"
-if [[ $? -ne 0 || -z $active_session ]]; then
-  echo "Error: Unable to determine active session"
-  exit 1
-fi
-
-get_session_info $active_session session_info
-
-if [[ ${session_info[Type]} != "x11" ]]; then
-  echo "Error: Active session is not x11"
-  exit 2
-fi
-
-current_user="$(id -u -n)"
-
-if [[ ${current_user} == ${session_info[Name]} ]]; then
-  # already correct user, no need to su
-  DISPLAY="${session_info[Display]}" "$@"
+# Methods of running command as another user: http://tinyurl.com/lddsctk
+# Why printf is necessary                   : http://tinyurl.com/n796wcf
+if   [[ $EUID -eq 0 ]]; then
+  su $sess_user - -c "XAUTHORITY=/home/$sess_user/.Xauthority \
+    DISPLAY=$sess_disp $(printf '%q ' "$@")" &
+elif [[ $sess_user != $USER ]]; then
+  su $sess_user - -c "XAUTHORITY=/home/$sess_user/.Xauthority \
+    DISPLAY=$sess_disp $(printf '%q ' "$@")" &
 else
-  # run command as user 
-  DISPLAY="${session_info[Display]}" su -c - "${session_info[Name]}" "$(escape "$@")"
+  XAUTHORITY=/home/$sess_user/.Xauthority DISPLAY=$sess_disp "$@" &
 fi
-
