@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-xuserrun - Run a command as the currently-active X.org server user
+xuserrun - Run a command as the X.org server user
 
 =head1 SYNOPSIS
 
@@ -10,7 +10,7 @@ B<xuserrun> [program] [--options*]...
 
 =head1 DESCRIPTION
 
-xuserrun allows a command to be run on the X.org user's display.  It determines the DISPLAY and USER environmental variables of the logged-in user necessary to run a program through the X.org server display.  Its primary use is to be able to run a X.org program from within another environment (different user, console, cron, boot script...).
+B<xuserrun> allows a command to be run on the X.org user's display.  It determines the DISPLAY and USER environmental variables of the logged in user to run a program through the X.org server display.  Its primary use is to be able to run a X.org program from within another environment (different user, console, cron, boot script...).
 
 =head1 EXAMPLES
 
@@ -46,4 +46,4 @@ Todd Partridge E<lt>toddrpartridge@gmail.comE<gt>, Brain Mattern L<https://githu
 
 =head1 COPYRIGHT
 
-Copyright  ©  2013  Free Software Foundation, Inc.  License GPLv3+: GNU GPL version 3 or later L<http://gnu.org/licenses/gpl.html>.  This is free software: you are free  to  change  and  redistribute  it.  There is NO WARRANTY, to the extent permitted by law.
+License GPLv2: GNU GPL version 2 L<http://gnu.org/licenses/gpl.html>.
