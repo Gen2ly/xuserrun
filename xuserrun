@@ -6,12 +6,12 @@ if [[ -z "$@" ]]; then
   echo "${0##*/} [program] [--options*] [...*] - run a program as the X.org server user"
   exit 1; fi
 
-# Programs existence check
+# Program(s) existence check
 for prog in loginctl "$1"; do
   if ! hash $prog 2>&- /dev/null; then
-    echo "${0##*/}: non-existent program or not installed: "$prog"" && \
+    echo "${0##*/}: program required: "$prog"" && \
     non_prog=yes; fi; done
-    [[ $non_prog = yes ]] && exit 1
+[ "$non_prog" = yes ] && exit 1
 
 # Discover DISPLAY and USER values (from first)
 seat="seat0" # only single-seated (single-server) use detectable
