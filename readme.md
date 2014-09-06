@@ -7,7 +7,6 @@
 ```bash
 xuserrun xclock -digital
 ```
-
 ```bash
 xuserrun bash -c "xterm & xclock"
 ```
