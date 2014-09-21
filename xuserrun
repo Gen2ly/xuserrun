@@ -15,10 +15,10 @@ for prog in loginctl "$1"; do
 
 # Discover DISPLAY and USER values (from first)
 seat="seat0" # only single-seated (single-server) use detectable
-actv_sesss=$(loginctl show-seat $seat -p Sessions | cut -d= -f2 | rev)
+actv_sesss=$(loginctl show-seat $seat -p Sessions 2>/dev/null | cut -d= -f2 | rev)
 for session in ${actv_sesss[@]}; do
-  sess_disp=$(loginctl show-session $session -p Display | cut -d= -f2)
-  sess_user=$(loginctl show-session $session -p Name    | cut -d= -f2)
+  sess_disp=$(loginctl show-session $session -p Display 2>/dev/null | cut -d= -f2)
+  sess_user=$(loginctl show-session $session -p Name    2>/dev/null | cut -d= -f2)
   [[ $sess_disp = :[[0-9] ]] && break; done
 
 # Exit if no X.org server is running
