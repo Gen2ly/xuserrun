@@ -28,11 +28,11 @@ for session in ${actv_sesss[@]}; do
 # Methods of running command as another user: http://tinyurl.com/lddsctk
 # Why printf is necessary                   : http://tinyurl.com/n796wcf
 if   [[ $EUID -eq 0 ]]; then
-  su $sess_user - -c "XAUTHORITY=/home/$sess_user/.Xauthority \
+  su $sess_user - -c "XAUTHORITY=~$sess_user/.Xauthority \
     DISPLAY=$sess_disp $(printf '%q ' "$@")" &
 elif [[ $sess_user != $USER ]]; then
-  su $sess_user - -c "XAUTHORITY=/home/$sess_user/.Xauthority \
+  su $sess_user - -c "XAUTHORITY=~$sess_user/.Xauthority \
     DISPLAY=$sess_disp $(printf '%q ' "$@")" &
 else
-  XAUTHORITY=/home/$sess_user/.Xauthority DISPLAY=$sess_disp "$@" &
+  XAUTHORITY=~$sess_user/.Xauthority DISPLAY=$sess_disp "$@" &
 fi
